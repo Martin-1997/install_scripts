@@ -2,7 +2,7 @@
 set -euo pipefail
 
 usage() {
-  echo "Usage: $0 [--gui] [--flatpak] [--development] [--kde] [--ai] [--omz]"
+  echo "Usage: $0 [--gui] [--flatpak] [--development] [--kde] [--ai] [--omz] [--custom_repo]"
 }
 
 want_gui=false
@@ -11,6 +11,7 @@ want_development=false
 want_kde=false
 want_ai=false
 want_omz=false
+want_custom_repo=false
 for arg in "$@"; do
   case "$arg" in
     --gui)
@@ -30,6 +31,9 @@ for arg in "$@"; do
       ;;
     --omz)
       want_omz=true
+      ;;
+    --custom_repo)
+      want_custom_repo=true
       ;;
     -h|--help)
       usage
@@ -127,8 +131,36 @@ if "$want_omz"; then
   git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 fi
 
+if "$want_custom_repo"; then
+  # VS Codium
+  # https://vscodium.com/
+  wget -qO - https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg \
+    | gpg --dearmor \
+    | sudo dd of=/usr/share/keyrings/vscodium-archive-keyring.gpg
+  echo -e 'Types: deb\nURIs: https://download.vscodium.com/debs\nSuites: vscodium\nComponents: main\nArchitectures: amd64 arm64\nSigned-by: /usr/share/keyrings/vscodium-archive-keyring.gpg' \
+    | sudo tee /etc/apt/sources.list.d/vscodium.sources
+  sudo apt-get update
+  sudo apt-get install -y codium
 
+  # Brave
+  # https://brave.com/linux/
+  sudo apt-get install -y curl
+  sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+  sudo curl -fsSLo /etc/apt/sources.list.d/brave-browser-release.sources https://brave-browser-apt-release.s3.brave.com/brave-browser.sources
+  sudo apt-get update
+  sudo apt-get install -y brave-browser
 
+  # Eza
+  # https://github.com/eza-community/eza/blob/main/INSTALL.md
+  sudo mkdir -p /etc/apt/keyrings
+  wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc \
+    | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
+  echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" \
+    | sudo tee /etc/apt/sources.list.d/gierens.list
+  sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
+  sudo apt-get update
+  sudo apt-get install -y eza
+fi
 
 
 # Manual Steps
@@ -138,9 +170,6 @@ fi
 # Set strong passwords
 # Update .bashrc to include /usr/sbin/
 # PATH=$PATH:/usr/sbin/
-
-# Install eza
-# https://github.com/eza-community/eza/blob/main/INSTALL.md#debian-and-ubuntu
 
 # Disable IPv6
 
