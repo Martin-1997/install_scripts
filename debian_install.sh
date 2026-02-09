@@ -119,7 +119,7 @@ fi
 if "$want_ai"; then
   # Placeholder for AI tools
   sudo apt-get install -y npm
-  npm i -g @openai/codex
+  sudo npm i -g @openai/codex
 fi
 
 if "$want_omz"; then
