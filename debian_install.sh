@@ -85,7 +85,9 @@ sudo chsh -s "$zsh_path"
 # Set zsh as default shell for the user martin
 sudo chsh -s "$zsh_path" martin
 
-bash "${HOME}"/.unix_setup/config_files/git_setup.sh
+if [ -f "${HOME}/.unix_setup/config_files/git_setup.sh" ]; then
+  bash "${HOME}/.unix_setup/config_files/git_setup.sh"
+fi
 
 if "$want_gui"; then
   sudo apt-get install -y keepassxc
