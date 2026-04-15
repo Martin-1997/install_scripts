@@ -6,7 +6,7 @@ usage() {
   echo ""
   echo "Presets (individual flags can be added on top of any preset):"
   echo "  --preset server   Base packages only"
-  echo "  --preset vm       Base + omz + eza + pyenv + nerd-font"
+  echo "  --preset vm       Base + omz + eza + nerd-font"
   echo "  --preset desktop  Base + gui + flatpak + kde + custom_repo + omz + eza + nerd-font"
 }
 
@@ -34,7 +34,6 @@ for arg in "$@"; do
     --preset=vm)
       want_omz=true
       want_eza=true
-      want_pyenv=true
       want_nerd_font=true
       ;;
     --preset=desktop)
