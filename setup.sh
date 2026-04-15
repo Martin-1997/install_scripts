@@ -9,7 +9,7 @@
 # Logout and login again
 
 
-current_folder=$(pwd)
+current_folder="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 backup_file(){
     # cp ~/.zshrc  ~/.zshrc_before_setup
@@ -24,10 +24,12 @@ create_link(){
 }
 
 # ZSH main config file
-create_link ~/.zshrc ${current_folder}/config_files/zsh/zshrc
+create_link ~/.zshrc ${current_folder}/zshrc
 
 # TMUX config file
-create_link ~/.tmux.conf ${current_folder}/config_files/tmux.conf
+create_link ~/.tmux.conf ${current_folder}/tmux.conf
 
 # oh my zsh main theme
-create_link ~/.oh-my-zsh/themes/robbyrussell.zsh-theme ${current_folder}/config_files/zsh/robbyrussell.zsh-theme
+create_link ~/.oh-my-zsh/themes/robbyrussell.zsh-theme ${current_folder}/robbyrussell.zsh-theme
+
+# source ~/.zshrc

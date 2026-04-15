@@ -47,7 +47,7 @@ alias esrc="vim ~/.zshrc"
 alias v="vim"
 alias ls="eza --icons=always --git --git-repos"
 
-source "${HOME}/.unix_setup/scripts/general_update.sh"
+source "${HOME}/.unix_setup/public/scripts/general_update.sh"
 
 # If VS Code is not installed, invoke VS Codium with the same command
 if ! command -v code >/dev/null 2>&1; then
