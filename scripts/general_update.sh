@@ -62,6 +62,7 @@ function update() {
                 echo "Updating .unix_setup/public repository..."
                 git pull || echo "Warning: git pull failed, continuing anyway..."
                 git submodule update --init --recursive || echo "Warning: submodule update failed, continuing anyway..."
+            fi
         fi
     )
 

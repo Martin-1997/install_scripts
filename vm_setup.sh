@@ -18,9 +18,6 @@ export CHSH=no
 echo "==> [2/3] Linking dotfiles..."
 ln -sf "$SCRIPT_DIR/zshrc" "$HOME/.zshrc"
 ln -sf "$SCRIPT_DIR/robbyrussell.zsh-theme" "$HOME/.oh-my-zsh/themes/robbyrussell.zsh-theme"
-if [[ -f "$SCRIPT_DIR/tmux.conf" ]]; then
-  ln -sf "$SCRIPT_DIR/tmux.conf" "$HOME/.tmux.conf"
-fi
 
 echo "==> [3/3] Updating system..."
 # shellcheck source=scripts/general_update.sh

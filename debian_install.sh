@@ -114,16 +114,14 @@ sudo apt-get install -y \
   bat \
   wireguard \
   wireguard-tools \
-  # iperf3 \
   traceroute \
   iftop \
   dnsutils \
   tcpdump \
   fontconfig
 
-# Change default shell to zsh for root and the target user
+# Change default shell to zsh for the target user
 zsh_path="$(command -v zsh)"
-sudo chsh -s "$zsh_path"
 sudo chsh -s "$zsh_path" "$TARGET_USER"
 
 # pyenv: not available via apt — install manually if needed
@@ -201,7 +199,7 @@ fi
 
 if "$want_pyenv"; then
   # pyenv — https://github.com/pyenv/pyenv
-  # curl -fsSL https://pyenv.run | bash
+  curl -fsSL https://pyenv.run | bash
 fi
 
 if "$want_nerd_font"; then

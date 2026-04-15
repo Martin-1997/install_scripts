@@ -32,22 +32,19 @@ fi
 
 ZSH_DISABLE_COMPFIX=false
 
-source $ZSH/oh-my-zsh.sh
+source "$ZSH/oh-my-zsh.sh"
 
-# Preferred editor for local and remote sessions
-if [[ -n $SSH_CONNECTION ]]; then
-   export EDITOR='vim'
-else
-   export EDITOR='mvim'
-fi
+export EDITOR='vim'
 
 # Aliases
 alias src="source ~/.zshrc"
 alias esrc="vim ~/.zshrc"
 alias v="vim"
-alias ls="eza --icons=always --git --git-repos"
+if command -v eza &>/dev/null; then
+    alias ls="eza --icons=always --git --git-repos"
+fi
 
-source "${HOME}/.unix_setup/public/scripts/general_update.sh"
+[[ -f "${HOME}/.unix_setup/public/scripts/general_update.sh" ]] && source "${HOME}/.unix_setup/public/scripts/general_update.sh"
 
 # If VS Code is not installed, invoke VS Codium with the same command
 if ! command -v code >/dev/null 2>&1; then
@@ -59,11 +56,11 @@ touch2() { mkdir -p "$(dirname "$1")" && touch "$1" ; }
 
 function mkdiro {
   # command: bypasses any shell aliases or functions that might have overridden mkdir
-  command mkdir $1 && cd $1
+  command mkdir "$1" && cd "$1"
 }
 
 # Use thin cursor instead of block-shaped cursor
-echo '\e[5 q'
+printf '\e[5 q'
 
 # Avoid autocorrection
 unsetopt correct_all
@@ -86,7 +83,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     export PATH=/opt/homebrew/bin:$PATH
 
     # zsh-autosuggestions (via brew)
-    source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+    source "$(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 
     # iTerm2 shell integration
     test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh" || true
