@@ -2,7 +2,12 @@
 set -euo pipefail
 
 usage() {
-  echo "Usage: $0 [--gui] [--flatpak] [--development] [--kde] [--ai] [--omz] [--custom_repo] [--eza]"
+  echo "Usage: $0 [--preset server|vm|desktop] [--gui] [--flatpak] [--development] [--kde] [--ai] [--omz] [--custom_repo] [--eza]"
+  echo ""
+  echo "Presets (individual flags can be added on top of any preset):"
+  echo "  --preset server   Base packages only"
+  echo "  --preset vm       Base + omz + eza"
+  echo "  --preset desktop  Base + gui + flatpak + kde + custom_repo + omz + eza"
 }
 
 want_gui=false
@@ -16,6 +21,26 @@ want_eza=false
 
 for arg in "$@"; do
   case "$arg" in
+    --preset)
+      echo "Error: --preset requires a value (server, vm, or desktop)"
+      usage
+      exit 1
+      ;;
+    --preset=server)
+      # Base packages only; nothing extra to set
+      ;;
+    --preset=vm)
+      want_omz=true
+      want_eza=true
+      ;;
+    --preset=desktop)
+      want_gui=true
+      want_flatpak=true
+      want_kde=true
+      want_custom_repo=true
+      want_omz=true
+      want_eza=true
+      ;;
     --gui)
       want_gui=true
       ;;
@@ -52,91 +77,89 @@ for arg in "$@"; do
   esac
 done
 
+# Determine the target user (works whether called directly or via sudo)
+TARGET_USER="${SUDO_USER:-$USER}"
+
 sudo apt-get update
 sudo apt-get upgrade -y
 sudo apt-get dist-upgrade -y
 
-sudo apt-get install -y gnupg2
-sudo apt-get install -y curl
-sudo apt-get install -y nmap
-sudo apt-get install -y sudo
-sudo apt-get install -y nano
-sudo apt-get install -y vim
-sudo apt-get install -y tmux
-sudo apt-get install -y openvpn
-sudo apt-get install -y git
-sudo apt-get install -y unzip
-sudo apt-get install -y htop
-sudo apt-get install -y gcc
-sudo apt-get install -y net-tools
-sudo apt-get install -y ufw
-sudo apt-get install -y zsh
-sudo apt-get install -y pyenv
-sudo apt-get install -y bat
-sudo apt-get install -y wireguard
-sudo apt-get install -y wireguard-tools
-sudo apt-get install -y iperf3
-sudo apt-get install -y traceroute
-sudo apt-get install -y iftop
-sudo apt-get install -y dnsutils
-sudo apt-get install -y tcpdump
+sudo apt-get install -y \
+  gnupg2 \
+  curl \
+  nmap \
+  sudo \
+  nano \
+  vim \
+  tmux \
+  openvpn \
+  git \
+  unzip \
+  htop \
+  gcc \
+  net-tools \
+  ufw \
+  zsh \
+  bat \
+  wireguard \
+  wireguard-tools \
+  iperf3 \
+  traceroute \
+  iftop \
+  dnsutils \
+  tcpdump
 
-# Change shell to zsh (root and martin)
+# Change default shell to zsh for root and the target user
 zsh_path="$(command -v zsh)"
-chsh -s "$zsh_path"
-
-# Set zsh as default shell for root
 sudo chsh -s "$zsh_path"
-# Set zsh as default shell for the user martin
-sudo chsh -s "$zsh_path" martin
+sudo chsh -s "$zsh_path" "$TARGET_USER"
+
+# pyenv: not available via apt — install manually if needed
+# See: https://github.com/pyenv/pyenv#installation
 
 if "$want_gui"; then
-  sudo apt-get install -y keepassxc
-  sudo apt-get install -y chromium-browser
-  sudo apt-get install -y alacarte
-  sudo apt-get install -y okular
-  sudo apt-get install -y terminator
-  sudo apt-get install -y gimp
-
+  sudo apt-get install -y \
+    keepassxc \
+    chromium-browser \
+    alacarte \
+    okular \
+    terminator \
+    gimp
 fi
 
 if "$want_flatpak"; then
   sudo apt-get install -y flatpak
   flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-  # GNOME
-  # sudo apt install gnome-software-plugin-flatpak
+  # GNOME: sudo apt install gnome-software-plugin-flatpak
   # Install Gear Lever to manage AppImages
   flatpak install flathub it.mijorus.gearlever -y
 fi
 
 if "$want_kde"; then
-  sudo apt-get install -y kde-config-flatpak
-  sudo apt-get install -y yakuake
+  sudo apt-get install -y \
+    kde-config-flatpak \
+    yakuake
 fi
 
 if "$want_development"; then
   sudo apt-get install -y podman
-  # Manual steps
-  # install Docker
-  true
+  # Manual step: install Docker
+  # https://docs.docker.com/engine/install/debian/
 fi
 
 if "$want_ai"; then
-  # Placeholder for AI tools
-  # sudo apt-get install -y npm
-  # sudo npm i -g @openai/codex
+  # Manual step: install Node.js, then npm i -g @openai/codex or @anthropic-ai/claude-code
+  # https://nodejs.org/en/download
+  true
 fi
 
 if "$want_omz"; then
-  # Install omz autosuggestions
-  # https://github.com/zsh-users/zsh-autosuggestions/blob/master/INSTALL.md
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
   git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 fi
 
 if "$want_custom_repo"; then
-  # VS Codium
-  # https://vscodium.com/
+  # VS Codium — https://vscodium.com/
   wget -qO - https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg \
     | gpg --dearmor \
     | sudo dd of=/usr/share/keyrings/vscodium-archive-keyring.gpg
@@ -145,9 +168,7 @@ if "$want_custom_repo"; then
   sudo apt-get update
   sudo apt-get install -y codium
 
-  # Brave
-  # https://brave.com/linux/
-  sudo apt-get install -y curl
+  # Brave — https://brave.com/linux/
   sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
   sudo curl -fsSLo /etc/apt/sources.list.d/brave-browser-release.sources https://brave-browser-apt-release.s3.brave.com/brave-browser.sources
   sudo apt-get update
@@ -155,8 +176,7 @@ if "$want_custom_repo"; then
 fi
 
 if "$want_eza"; then
-  # Eza
-  # https://github.com/eza-community/eza/blob/main/INSTALL.md
+  # Eza — https://github.com/eza-community/eza/blob/main/INSTALL.md
   sudo mkdir -p /etc/apt/keyrings
   wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc \
     | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
@@ -167,16 +187,13 @@ if "$want_eza"; then
   sudo apt-get install -y eza
 fi
 
-
-# Manual Steps
-# Setup sudo for second user
-# Setup ufw
-# Change ssh port
-# Set strong passwords
-# Update .bashrc to include /usr/sbin/
-# PATH=$PATH:/usr/sbin/
-
-# Disable IPv6
-
-# Install pyenv
-# https://github.com/pyenv/pyenv
+# Manual steps:
+# - Setup sudo for additional users
+# - Configure ufw rules
+# - Change SSH port in /etc/ssh/sshd_config
+# - Set strong passwords
+# - Add /usr/sbin to PATH in ~/.zshrc: export PATH=$PATH:/usr/sbin
+# - Disable IPv6 (add to /etc/sysctl.conf):
+#     net.ipv6.conf.all.disable_ipv6 = 1
+#     net.ipv6.conf.default.disable_ipv6 = 1
+# - Install pyenv: https://github.com/pyenv/pyenv#installation
