@@ -10,10 +10,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(dirname "$SCRIPT_DIR")"
 
 echo "==> [1/3] Installing packages (preset: vm)..."
-# RUNZSH=no prevents the omz installer from opening an interactive zsh session.
-# CHSH=no skips omz's own chsh — debian_install.sh already handles it.
-export RUNZSH=no
-export CHSH=no
 "$SCRIPT_DIR/debian_install.sh" --preset=vm
 
 echo "==> [2/3] Updating system..."

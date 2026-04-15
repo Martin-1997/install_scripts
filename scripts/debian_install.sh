@@ -150,7 +150,11 @@ if "$want_ai"; then
 fi
 
 if "$want_omz"; then
-  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  # RUNZSH=no  — don't launch zsh after install (we're in a non-interactive script)
+  # CHSH=no    — don't change the shell here; debian_install.sh already handles it
+  # KEEP_ZSHRC=yes — don't prompt about backing up an existing .zshrc
+  RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
   git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 fi
 
