@@ -30,7 +30,7 @@ function update_debian() {
 
 function update_macos() {
     update_omz
-    
+
     local brew_bin
     if [[ -x /opt/homebrew/bin/brew ]]; then
         brew_bin=/opt/homebrew/bin/brew
@@ -51,8 +51,18 @@ function update() {
     # Update repository in a subshell so the caller's cwd is preserved
     (
         cd "$HOME/.unix_setup" || exit 1
-        echo "Updating .unix_setup repository..."
-        git pull || echo "Warning: git pull failed, continuing anyway..."
+        if git rev-parse --git-dir > /dev/null 2>&1; then
+            echo "Updating .unix_setup repository..."
+            git pull || echo "Warning: git pull failed, continuing anyway..."
+            git submodule update --init --recursive || echo "Warning: submodule update failed, continuing anyway..."
+        else
+            echo "Warning: $HOME/.unix_setup exists but is not a Git repository, Update .unix_setup/public instead"
+            cd "$HOME/.unix_setup/public" || exit 1
+            if git rev-parse --git-dir > /dev/null 2>&1; then
+                echo "Updating .unix_setup/public repository..."
+                git pull || echo "Warning: git pull failed, continuing anyway..."
+                git submodule update --init --recursive || echo "Warning: submodule update failed, continuing anyway..."
+        fi
     )
 
     if [[ "$OSTYPE" == "darwin"* ]]; then
