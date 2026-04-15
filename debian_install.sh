@@ -201,7 +201,7 @@ fi
 
 if "$want_pyenv"; then
   # pyenv — https://github.com/pyenv/pyenv
-  curl -fsSL https://pyenv.run | bash
+  # curl -fsSL https://pyenv.run | bash
 fi
 
 if "$want_nerd_font"; then

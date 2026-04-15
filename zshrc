@@ -92,8 +92,8 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh" || true
 
     # Pyenv
-    eval "$(pyenv init - zsh)"
-    eval "$(pyenv virtualenv-init -)"
+    # eval "$(pyenv init - zsh)"
+    # eval "$(pyenv virtualenv-init -)"
 
 
     # Java (Zulu OSS JDK for React Native Development)
@@ -118,7 +118,7 @@ else
     alias bat="batcat"
 
     # Pyenv
-    eval "$(pyenv init -)"
+    # eval "$(pyenv init -)"
 
     # NVM
     export NVM_DIR="$HOME/.nvm"
