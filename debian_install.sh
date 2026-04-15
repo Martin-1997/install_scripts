@@ -2,7 +2,7 @@
 set -euo pipefail
 
 usage() {
-  echo "Usage: $0 [--gui] [--flatpak] [--development] [--kde] [--ai] [--omz] [--custom_repo]"
+  echo "Usage: $0 [--gui] [--flatpak] [--development] [--kde] [--ai] [--omz] [--custom_repo] [--eza]"
 }
 
 want_gui=false
@@ -12,6 +12,8 @@ want_kde=false
 want_ai=false
 want_omz=false
 want_custom_repo=false
+want_eza=false
+
 for arg in "$@"; do
   case "$arg" in
     --gui)
@@ -34,6 +36,9 @@ for arg in "$@"; do
       ;;
     --custom_repo)
       want_custom_repo=true
+      ;;
+    --eza)
+      want_eza=true
       ;;
     -h|--help)
       usage
@@ -118,8 +123,8 @@ fi
 
 if "$want_ai"; then
   # Placeholder for AI tools
-  sudo apt-get install -y npm
-  sudo npm i -g @openai/codex
+  # sudo apt-get install -y npm
+  # sudo npm i -g @openai/codex
 fi
 
 if "$want_omz"; then
@@ -147,7 +152,9 @@ if "$want_custom_repo"; then
   sudo curl -fsSLo /etc/apt/sources.list.d/brave-browser-release.sources https://brave-browser-apt-release.s3.brave.com/brave-browser.sources
   sudo apt-get update
   sudo apt-get install -y brave-browser
+fi
 
+if "$want_eza"; then
   # Eza
   # https://github.com/eza-community/eza/blob/main/INSTALL.md
   sudo mkdir -p /etc/apt/keyrings
