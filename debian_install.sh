@@ -2,12 +2,12 @@
 set -euo pipefail
 
 usage() {
-  echo "Usage: $0 [--preset server|vm|desktop] [--gui] [--flatpak] [--development] [--kde] [--ai] [--omz] [--custom_repo] [--eza]"
+  echo "Usage: $0 [--preset server|vm|desktop] [--gui] [--flatpak] [--development] [--kde] [--ai] [--omz] [--custom_repo] [--eza] [--pyenv] [--nerd-font]"
   echo ""
   echo "Presets (individual flags can be added on top of any preset):"
   echo "  --preset server   Base packages only"
-  echo "  --preset vm       Base + omz + eza"
-  echo "  --preset desktop  Base + gui + flatpak + kde + custom_repo + omz + eza"
+  echo "  --preset vm       Base + omz + eza + pyenv + nerd-font"
+  echo "  --preset desktop  Base + gui + flatpak + kde + custom_repo + omz + eza + nerd-font"
 }
 
 want_gui=false
@@ -18,6 +18,8 @@ want_ai=false
 want_omz=false
 want_custom_repo=false
 want_eza=false
+want_pyenv=false
+want_nerd_font=false
 
 for arg in "$@"; do
   case "$arg" in
@@ -32,6 +34,8 @@ for arg in "$@"; do
     --preset=vm)
       want_omz=true
       want_eza=true
+      want_pyenv=true
+      want_nerd_font=true
       ;;
     --preset=desktop)
       want_gui=true
@@ -40,6 +44,7 @@ for arg in "$@"; do
       want_custom_repo=true
       want_omz=true
       want_eza=true
+      want_nerd_font=true
       ;;
     --gui)
       want_gui=true
@@ -64,6 +69,12 @@ for arg in "$@"; do
       ;;
     --eza)
       want_eza=true
+      ;;
+    --pyenv)
+      want_pyenv=true
+      ;;
+    --nerd-font)
+      want_nerd_font=true
       ;;
     -h|--help)
       usage
@@ -103,11 +114,12 @@ sudo apt-get install -y \
   bat \
   wireguard \
   wireguard-tools \
-  iperf3 \
+  # iperf3 \
   traceroute \
   iftop \
   dnsutils \
-  tcpdump
+  tcpdump \
+  fontconfig
 
 # Change default shell to zsh for root and the target user
 zsh_path="$(command -v zsh)"
@@ -187,6 +199,23 @@ if "$want_eza"; then
   sudo apt-get install -y eza
 fi
 
+if "$want_pyenv"; then
+  # pyenv — https://github.com/pyenv/pyenv
+  curl -fsSL https://pyenv.run | bash
+fi
+
+if "$want_nerd_font"; then
+  # JetBrains Mono Nerd Font — required for eza --icons and terminal icon rendering
+  # https://www.nerdfonts.com/
+  FONT_DIR="/usr/local/share/fonts/JetBrainsMonoNerdFont"
+  sudo mkdir -p "$FONT_DIR"
+  wget -qO /tmp/JetBrainsMono.zip \
+    https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip
+  sudo unzip -o /tmp/JetBrainsMono.zip -d "$FONT_DIR"
+  rm /tmp/JetBrainsMono.zip
+  sudo fc-cache -fv
+fi
+
 # Manual steps:
 # - Setup sudo for additional users
 # - Configure ufw rules
@@ -196,4 +225,3 @@ fi
 # - Disable IPv6 (add to /etc/sysctl.conf):
 #     net.ipv6.conf.all.disable_ipv6 = 1
 #     net.ipv6.conf.default.disable_ipv6 = 1
-# - Install pyenv: https://github.com/pyenv/pyenv#installation

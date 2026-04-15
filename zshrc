@@ -55,9 +55,12 @@ if ! command -v code >/dev/null 2>&1; then
 fi
 
 # Functions
-source "${HOME}/.unix_setup/functions/addssh.sh"
-source "${HOME}/.unix_setup/functions/mkdiro.sh"
-source "${HOME}/.unix_setup/functions/touch2.sh"
+touch2() { mkdir -p "$(dirname "$1")" && touch "$1" ; }
+
+function mkdiro {
+  # command: bypasses any shell aliases or functions that might have overridden mkdir
+  command mkdir $1 && cd $1
+}
 
 # Use thin cursor instead of block-shaped cursor
 echo '\e[5 q'
