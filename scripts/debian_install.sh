@@ -2,11 +2,12 @@
 set -euo pipefail
 
 usage() {
-  echo "Usage: $0 [--preset server|vm|desktop] [--gui] [--flatpak] [--development] [--kde] [--ai] [--omz] [--custom_repo] [--pyenv]"
+  echo "Usage: $0 [--preset server|vm|vm_ai|desktop] [--gui] [--flatpak] [--development] [--kde] [--ai] [--omz] [--custom_repo] [--pyenv]"
   echo ""
   echo "Presets (individual flags can be added on top of any preset):"
   echo "  --preset server   Base packages only"
   echo "  --preset vm       Base + omz + pyenv"
+  echo "  --preset vm_ai    Base + omz + ai"
   echo "  --preset desktop  Base + gui + flatpak + kde + custom_repo + omz"
 }
 
@@ -22,7 +23,7 @@ want_pyenv=false
 for arg in "$@"; do
   case "$arg" in
     --preset)
-      echo "Error: --preset requires a value (server, vm, or desktop)"
+      echo "Error: --preset requires a value (server, vm, vm_ai, or desktop)"
       usage
       exit 1
       ;;
@@ -32,6 +33,10 @@ for arg in "$@"; do
     --preset=vm)
       want_omz=true
       want_pyenv=true
+      ;;
+    --preset=vm_ai)
+      want_omz=true
+      want_ai=true
       ;;
     --preset=desktop)
       want_gui=true
@@ -83,44 +88,42 @@ sudo apt-get update
 sudo apt-get upgrade -y
 sudo apt-get dist-upgrade -y
 
-sudo apt-get install -y \
-  gnupg2 \
-  curl \
-  nmap \
-  sudo \
-  nano \
-  vim \
-  tmux \
-  openvpn \
-  git \
-  unzip \
-  htop \
-  gcc \
-  net-tools \
-  ufw \
-  zsh \
-  bat \
-  eza \
-  wireguard \
-  wireguard-tools \
-  traceroute \
-  iftop \
-  dnsutils \
-  tcpdump \
-  fontconfig
+sudo apt-get install -y gnupg2
+sudo apt-get install -y curl
+sudo apt-get install -y nmap
+sudo apt-get install -y sudo
+sudo apt-get install -y nano
+sudo apt-get install -y vim
+sudo apt-get install -y tmux
+sudo apt-get install -y openvpn
+sudo apt-get install -y git
+sudo apt-get install -y unzip
+sudo apt-get install -y htop
+# sudo apt-get install -y gcc
+sudo apt-get install -y net-tools
+sudo apt-get install -y ufw
+sudo apt-get install -y zsh
+sudo apt-get install -y bat
+sudo apt-get install -y eza
+# sudo apt-get install -y wireguard
+# sudo apt-get install -y wireguard-tools
+sudo apt-get install -y traceroute
+sudo apt-get install -y iftop
+sudo apt-get install -y dnsutils
+sudo apt-get install -y tcpdump
+# sudo apt-get install -y fontconfig
 
 # Change default shell to zsh for the target user
 zsh_path="$(command -v zsh)"
 sudo chsh -s "$zsh_path" "$TARGET_USER"
 
 if "$want_gui"; then
-  sudo apt-get install -y \
-    keepassxc \
-    chromium-browser \
-    alacarte \
-    okular \
-    terminator \
-    gimp
+  sudo apt-get install -y keepassxc
+  sudo apt-get install -y chromium-browser
+  sudo apt-get install -y alacarte
+  sudo apt-get install -y okular
+  sudo apt-get install -y terminator
+  sudo apt-get install -y gimp
 fi
 
 if "$want_flatpak"; then
@@ -132,9 +135,8 @@ if "$want_flatpak"; then
 fi
 
 if "$want_kde"; then
-  sudo apt-get install -y \
-    kde-config-flatpak \
-    yakuake
+  sudo apt-get install -y kde-config-flatpak
+  sudo apt-get install -y yakuake
 fi
 
 if "$want_development"; then
@@ -144,9 +146,7 @@ if "$want_development"; then
 fi
 
 if "$want_ai"; then
-  # Manual step: install Node.js, then npm i -g @openai/codex or @anthropic-ai/claude-code
-  # https://nodejs.org/en/download
-  true
+  curl -fsSL https://claude.ai/install.sh | bash
 fi
 
 if "$want_omz"; then
