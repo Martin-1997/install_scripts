@@ -146,10 +146,11 @@ if "$want_development"; then
 fi
 
 if "$want_ai"; then
-  puts "Installing Claude Code ..."
+  echo "Installing Claude Code ..."
   curl -fsSL https://claude.ai/install.sh | bash
   echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.unix_setup/public/zshrc
-  puts "Claude Code installed successfully!"
+  echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc && source ~/.bashrc
+  echo "Claude Code installed successfully!"
 fi
 
 if "$want_omz"; then
